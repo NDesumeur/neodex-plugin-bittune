@@ -1,9 +1,9 @@
 {
   "id": "neodex.bittune",
   "name": "BitTune",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "NDesumeur",
-  "description": "Compose de la musique chiptune sur une grille, avec les 4 voies des vieilles consoles : deux ondes carrées (rapport cyclique 12,5, 25 ou 50 %), une triangle pour la basse et un bruit pour les percussions. 4 motifs de 32 pas enchaînés dans l'ordre que tu veux, notes tenues, tempo, volume par voie, lecture en boucle et export en WAV.",
+  "description": "Compose de la musique chiptune : 5 voies (deux carrées, triangle, bruit à 6 percussions, dent de scie), 8 motifs de 32 pas sur 3 octaves, effets par note (vibrato, arpèges, glissés, piqué, volume), panoramique, écho, swing, gammes, muet et solo. Lecture avec oscilloscope, export WAV et MIDI, morceaux à enregistrer et 3 exemples.",
   "icon": "icon.png",
   "entry": "index.js",
   "view": "bittune",
