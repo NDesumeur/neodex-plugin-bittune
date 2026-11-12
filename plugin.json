@@ -1,0 +1,27 @@
+{
+  "id": "neodex.bittune",
+  "name": "BitTune",
+  "version": "1.0.0",
+  "author": "NDesumeur",
+  "description": "Compose de la musique chiptune sur une grille, avec les 4 voies des vieilles consoles : deux ondes carrées (rapport cyclique 12,5, 25 ou 50 %), une triangle pour la basse et un bruit pour les percussions. 4 motifs de 32 pas enchaînés dans l'ordre que tu veux, notes tenues, tempo, volume par voie, lecture en boucle et export en WAV.",
+  "icon": "icon.png",
+  "entry": "index.js",
+  "view": "bittune",
+  "neobase": ">=4.0.0",
+  "type": "app",
+  "category": "Outils",
+  "mobile": true,
+  "compatibility": [
+    "windows",
+    "android",
+    "linux"
+  ],
+  "syncMode": "fusion",
+  "syncInfo": "Les 4 motifs, l'ordre, le tempo et les réglages des voies.",
+  "system": false,
+  "dependencies": {},
+  "sdk": "2.1.0",
+  "permissions": [
+    "storage"
+  ]
+}
