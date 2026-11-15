@@ -35,3 +35,8 @@ Each voice has its own **volume**, **pan** (left or right), **echo**, **octave**
 ## Data
 
 The patterns, the order, the tempo and the voice settings are kept in the plugin folder. Permission: `storage` only.
+
+## Version 1.2.0
+
+- Bigger grid: 30 × 18 cells instead of 22 × 13, more readable note names and beat numbers; the grid uses more height.
+- Larger help text, pattern order and oscilloscope.

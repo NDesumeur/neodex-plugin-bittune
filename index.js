@@ -10,16 +10,16 @@ const CSS = `
 .btCh .btn i{display:inline-block;width:10px;height:10px;margin-right:6px;border:1px solid #000}
 .btCh .mini{padding:4px 6px;min-width:26px}
 .btCh .off{opacity:.45}
-.btWrap{overflow:auto;border:2px solid var(--line);background:#0b0816;max-height:460px}
+.btWrap{overflow:auto;border:2px solid var(--line);background:#0b0816;max-height:min(64vh,720px)}
 .btCan{display:block;image-rendering:pixelated;cursor:crosshair}
 .btRow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
 .btRow .btn{width:auto;margin:0;padding:4px 10px}
 .btRow .f{width:auto;margin:0}
 .btRange{-webkit-appearance:none;appearance:none;height:10px;background:var(--bg0);border:2px solid var(--line);outline:none;width:110px}
 .btRange::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:22px;background:var(--magenta);border:2px solid #000;cursor:var(--cp,pointer)}
-.btOrder{font:14px monospace;letter-spacing:2px;width:200px!important;text-transform:uppercase}
-.btHelp{font-size:12px;color:var(--lilac);margin-top:6px}
-.btScope{width:160px;height:40px;background:#0b0816;border:2px solid var(--line);image-rendering:pixelated}
+.btOrder{font:16px monospace;letter-spacing:2px;width:200px!important;text-transform:uppercase}
+.btHelp{font-size:15px;line-height:1.5;color:var(--lilac);margin-top:6px}
+.btScope{width:200px;height:48px;background:#0b0816;border:2px solid var(--line);image-rendering:pixelated}
 .btTool.main{outline:2px solid #fff}
 .btTool{min-width:34px}
 `;
@@ -206,29 +206,29 @@ export default async function (ctx) {
       el('span', 'hint', 'Gamme'), rt, sc, snapB);
   }
   // ---------- la grille ----------
-  const CW = 22, RH = 13, LEFT = 50;
+  const CW = 30, RH = 18, LEFT = 74, TOP = 22;  // des cases plus grandes
   const rows = () => ch === NOISE ? DRUMS.length : NOTES;
   const inScale = val => SCALES[song.scale].includes(((val - song.root) % 12 + 12) % 12);
   function draw() {
-    const R = rows(), H = R * RH; can.width = LEFT + STEPS * CW; can.height = H + 16;
+    const R = rows(), H = R * RH; can.width = LEFT + STEPS * CW; can.height = H + TOP;
     g.fillStyle = '#0b0816'; g.fillRect(0, 0, can.width, can.height);
-    g.font = '10px monospace'; g.textBaseline = 'middle';
+    g.font = '13px monospace'; g.textBaseline = 'middle';
     const sh = CH[ch][2] === 'tri' ? -1 : 0;
-    for (let r = 0; r < R; r++) { const y = 16 + r * RH, val = ch === NOISE ? r : NOTES - 1 - r, black = ch !== NOISE && [1, 3, 6, 8, 10].includes(val % 12), out = ch !== NOISE && !inScale(val), tonic = ch !== NOISE && (val - song.root) % 12 === 0;
+    for (let r = 0; r < R; r++) { const y = TOP + r * RH, val = ch === NOISE ? r : NOTES - 1 - r, black = ch !== NOISE && [1, 3, 6, 8, 10].includes(val % 12), out = ch !== NOISE && !inScale(val), tonic = ch !== NOISE && (val - song.root) % 12 === 0;
       g.fillStyle = out ? '#0d0a18' : tonic ? '#221a3c' : black ? '#120e22' : '#18142e'; g.fillRect(LEFT, y, STEPS * CW, RH - 1);
       g.fillStyle = black ? '#241c40' : '#3a2f5a'; g.fillRect(0, y, LEFT - 4, RH - 1);  // le clavier à gauche
-      g.fillStyle = out ? '#4a3f6a' : black ? '#8a7aa8' : '#e8e0ff'; g.fillText(ch === NOISE ? DRUMS[r][0].slice(0, 7) : NAMES[val % 12] + (3 + Math.floor(val / 12) + sh + (song.oct[ch] || 0)), 3, y + RH / 2); }
-    for (let i = 0; i < STEPS; i++) { g.fillStyle = i % 4 ? '#241c40' : '#3a2f5a'; g.fillRect(LEFT + i * CW, 16, 1, R * RH); if (i % 4 === 0) { g.fillStyle = '#8a7aa8'; g.fillText(String(i / 4 + 1), LEFT + i * CW + 3, 8); } }
-    song.pats[pat].forEach((voice, c) => { if (c === ch || c === NOISE || ch === NOISE) return; g.fillStyle = CH[c][1] + '33'; voice.forEach((v, i) => { if (v >= 0) g.fillRect(LEFT + i * CW + 2, 16 + (NOTES - 1 - v) * RH + 3, CW - 4, RH - 7); }); });  // les autres voies, en pâle
+      g.fillStyle = out ? '#4a3f6a' : black ? '#8a7aa8' : '#e8e0ff'; g.fillText(ch === NOISE ? DRUMS[r][0].slice(0, 9) : NAMES[val % 12] + (3 + Math.floor(val / 12) + sh + (song.oct[ch] || 0)), 3, y + RH / 2); }
+    for (let i = 0; i < STEPS; i++) { g.fillStyle = i % 4 ? '#241c40' : '#3a2f5a'; g.fillRect(LEFT + i * CW, TOP, 1, R * RH); if (i % 4 === 0) { g.fillStyle = '#8a7aa8'; g.fillText(String(i / 4 + 1), LEFT + i * CW + 4, 11); } }
+    song.pats[pat].forEach((voice, c) => { if (c === ch || c === NOISE || ch === NOISE) return; g.fillStyle = CH[c][1] + '33'; voice.forEach((v, i) => { if (v >= 0) g.fillRect(LEFT + i * CW + 2, TOP + (NOTES - 1 - v) * RH + 3, CW - 4, RH - 7); }); });  // les autres voies, en pâle
     const voice = song.pats[pat][ch], col = CH[ch][1];
-    voice.forEach((v, i) => { if (v < 0) return; let len = 1; while (i + len < STEPS && voice[i + len] === -2) len++; const r = ch === NOISE ? v : NOTES - 1 - v, ex = song.ex[pat][ch][i] || 0, x = LEFT + i * CW, y = 16 + r * RH;
+    voice.forEach((v, i) => { if (v < 0) return; let len = 1; while (i + len < STEPS && voice[i + len] === -2) len++; const r = ch === NOISE ? v : NOTES - 1 - v, ex = song.ex[pat][ch][i] || 0, x = LEFT + i * CW, y = TOP + r * RH;
       g.fillStyle = '#000'; g.fillRect(x + 1, y, len * CW - 1, RH - 1); g.globalAlpha = .35 + .65 * (ex.v || 4) / 4; g.fillStyle = col; g.fillRect(x + 2, y + 1, len * CW - 3, RH - 3); g.globalAlpha = 1;
       if (ex.f) { g.fillStyle = '#000'; g.fillText(FX.find(f => f[0] === ex.f)[1][0], x + 5, y + RH / 2); } if ((ex.v || 4) < 4) { g.fillStyle = '#000'; g.fillRect(x + len * CW - 5, y + RH - 3 - ex.v * 2, 2, ex.v * 2); } });
-    if (playing && playPat === pat && playStep >= 0) { g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(LEFT + playStep * CW, 16, CW, R * RH); }
+    if (playing && playPat === pat && playStep >= 0) { g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(LEFT + playStep * CW, TOP, CW, R * RH); }
     const n = PATS.split('').reduce((a, p) => a + song.pats[p].flat().filter(v => v >= 0).length, 0);
     status.replaceChildren(el('span', '', 'Morceau :'), ' ' + song.order.join('') + ' (' + song.order.length + ' × 32 ', el('span', '', 'pas'), ') · ' + n + ' ', el('span', '', 'notes'), ' · ' + Math.round(song.order.length * STEPS * 15 / song.bpm) + ' s');
   }
-  const cell = e => { const r = can.getBoundingClientRect(), x = (e.clientX - r.left) * can.width / r.width, y = (e.clientY - r.top) * can.height / r.height; return [Math.floor((x - LEFT) / CW), Math.floor((y - 16) / RH)]; };
+  const cell = e => { const r = can.getBoundingClientRect(), x = (e.clientX - r.left) * can.width / r.width, y = (e.clientY - r.top) * can.height / r.height; return [Math.floor((x - LEFT) / CW), Math.floor((y - TOP) / RH)]; };
   let drag = null;
   can.oncontextmenu = e => e.preventDefault();
   can.onpointerdown = e => {

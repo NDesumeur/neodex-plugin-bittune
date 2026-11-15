@@ -6,7 +6,7 @@ module.exports = async ({ pj, sleep }) => {
   await sleep(600);
   const n0 = await notes(); if (!(n0 > 40)) throw new Error('au départ : ' + await st());
   await pj(`document.querySelector('[data-pat=B]').click(), 0`);
-  const click = (i, row, move) => pj(`(() => { const c = document.getElementById('bt_grid'), r = c.getBoundingClientRect(), k = r.width / c.width, P = (i, row) => ({clientX: r.left + (50 + i * 22 + 11) * k, clientY: r.top + (16 + row * 13 + 6) * k, button: 0, bubbles: true, pointerId: 1});
+  const click = (i, row, move) => pj(`(() => { const c = document.getElementById('bt_grid'), r = c.getBoundingClientRect(), k = r.width / c.width, P = (i, row) => ({clientX: r.left + (74 + i * 30 + 15) * k, clientY: r.top + (22 + row * 18 + 9) * k, button: 0, bubbles: true, pointerId: 1});
     c.dispatchEvent(new PointerEvent('pointerdown', P(${i}, ${row}))); c.dispatchEvent(new PointerEvent('pointermove', P(${move ?? i}, ${row}))); c.dispatchEvent(new PointerEvent('pointerup', P(${move ?? i}, ${row}))); })(), 0`);
   await click(0, 12, 3); await sleep(100);
   if (await notes() !== n0 + 1) throw new Error('note posée : ' + await st());

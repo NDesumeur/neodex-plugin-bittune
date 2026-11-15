@@ -35,3 +35,8 @@ Chaque voie a son **volume**, son **panoramique** (gauche ou droite), son **éch
 ## Données
 
 Les motifs, l'ordre, le tempo et les réglages des voies sont gardés dans le dossier du plugin. Autorisation : `storage` seulement.
+
+## Version 1.2.0
+
+- Grille plus grande : cases de 30 × 18 au lieu de 22 × 13, noms des notes et numéros des temps plus lisibles ; la grille occupe plus de hauteur.
+- Textes d'aide, ordre des motifs et oscilloscope plus grands.
