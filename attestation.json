@@ -1,9 +1,9 @@
 {
   "pluginId": "neodex.bittune",
   "repo": "NDesumeur/neodex-plugin-bittune",
-  "version": "1.1.0",
-  "sha256": "3a3fc27b41973004152012811b2c281e3992b638d36f1260ec4ba037419d5e67",
-  "approvedAt": "2026-11-12T17:01:01.311Z",
+  "version": "1.2.0",
+  "sha256": "59dc75bb157d7eba503010302edf49c6ac5e5691db7c58aa51032409a3a42037",
+  "approvedAt": "2026-11-16T04:04:37.624Z",
   "neobase": ">=4.0.0",
-  "signature": "e0S6CwSYrq6OCVTAmMuUJCHFSRMd9KmaY0skgUU7OS1wp7Y+0DDeqQzz1/m+bARHfCvHv+ub3qrYbJVUIS2GBQ=="
+  "signature": "RPtTXbMtBqhhWvBuSoevTCt/EkRmjeF1UBV8kVshAliKMZi30wvQSaJrKblpd71BdTgOnGyxJePs/ReputysDQ=="
 }
