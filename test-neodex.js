@@ -32,5 +32,8 @@ module.exports = async ({ pj, sleep }) => {
   await pj(`document.getElementById('bt_play').click(), 0`); await sleep(1200);
   if (!/Pause/.test(await pj(`document.getElementById('bt_play').textContent`))) throw new Error('lecture');
   await pj(`document.querySelector('[data-pat=A]').click(), 0`);
-  return 'note tenue, vibrato, annuler, dent de scie, ordre, MIDI ' + files.midi + ' octets, WAV ' + files.wav + ' s, lecture ok';
+  // l'import MIDI (aller-retour d'un exemple) et le code de partage : vérifiés par le plugin au démarrage
+  const sc = await pj("document.querySelector('[data-selfcheck]')?.dataset.selfcheck"); if (sc !== 'ok') throw new Error('import MIDI ou code de partage : ' + sc);
+  if (!await pj("[...document.querySelectorAll('button')].some(b => b.textContent === 'Importer MIDI') && [...document.querySelectorAll('button')].some(b => b.textContent === 'Copier le code')")) throw new Error('boutons import et partage absents');
+  return 'import MIDI et code de partage, note tenue, vibrato, annuler, dent de scie, ordre, MIDI ' + files.midi + ' octets, WAV ' + files.wav + ' s, lecture ok';
 };

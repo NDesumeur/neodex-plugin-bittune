@@ -6,6 +6,10 @@ Compose chiptune music, with the 5 voices of old 8-bit consoles, per-note effect
 
 ![BitTune](screenshots/1.jpg)
 
+## MIDI import and code sharing (new in 1.3.0)
+
+Import MIDI opens a MIDI file into the patterns; Copy code and Paste a code share a song as text.
+
 ## Voices
 
 - **Square 1** and **Square 2**: melody and accompaniment. Three wave shapes: 12.5 %, 25 % or 50 % duty cycle (from nasal to round).
@@ -30,6 +34,8 @@ Each voice has its own **volume**, **pan** (left or right), **echo**, **octave**
 
 - **Export WAV** renders the whole song in 44.1 kHz stereo, effects and echo included.
 - **Export MIDI** gives a file for your music software: one MIDI channel per voice, the drums on channel 10.
+- **Import MIDI** opens a MIDI file: notes are snapped to sixteenths, on 8 patterns at most (16 bars in 4/4). Drums go to the noise voice, the four busiest channels to the others (the lowest to the triangle).
+- **Copy code** turns the song into a text code (BITTUNE1:…) to send to a friend; **Paste a code** opens it in their BitTune.
 - **Save the song** and **Open a song**: a `.bittune.json` file to keep or share it.
 
 ## Data

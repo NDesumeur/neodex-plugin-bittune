@@ -111,6 +111,61 @@ function midi(song) {
   const head = [77, 84, 104, 100, 0, 0, 0, 6, 0, 0, 0, 1, TPQ >> 8, TPQ & 255], L = trk.length;
   return new Uint8Array([...head, 77, 84, 114, 107, L >>> 24 & 255, L >> 16 & 255, L >> 8 & 255, L & 255, ...trk]);
 }
+// l'import MIDI : les notes ramenées à la double croche, 8 motifs de 32 pas au plus (16 mesures en 4/4).
+// Les percussions (voie 10) vont au bruit ; les quatre voies les plus remplies vont aux autres, la plus grave au triangle.
+// Les voies 1, 2, 3 et 5 d'un fichier de BitTune reviennent à leur place.
+function midiIn(bytes) {
+  const u = new Uint8Array(bytes), dv = new DataView(u.buffer, u.byteOffset, u.byteLength), tag = o => String.fromCharCode(...u.slice(o, o + 4));
+  if (u.length < 14 || tag(0) !== 'MThd') throw new Error('ce n\'est pas un fichier MIDI');
+  const ntr = dv.getUint16(10), div = dv.getUint16(12); if (div & 0x8000) throw new Error('MIDI au format SMPTE : non pris en charge');
+  let o = 8 + dv.getUint32(4), tempo = 0; const notes = [];
+  for (let k = 0; k < ntr && o + 8 <= u.length && tag(o) === 'MTrk'; k++) {
+    const end = Math.min(u.length, o + 8 + dv.getUint32(o + 4)), open = {}; let p = o + 8, t = 0, rs = 0;
+    const vlq = () => { let n = 0, c; do { c = u[p++]; n = n * 128 + (c & 127); } while (c & 128 && p < end); return n; };
+    while (p < end) {
+      t += vlq(); let st = u[p]; if (st & 128) { p++; if (st < 0xF0) rs = st; } else st = rs;
+      if (st === 0xFF) { const ty = u[p++], l = vlq(); if (ty === 0x51 && !tempo && l === 3) tempo = u[p] << 16 | u[p + 1] << 8 | u[p + 2]; p += l; continue; }
+      if (st === 0xF0 || st === 0xF7) { p += vlq(); continue; }
+      if (!st) break;
+      const hi = st & 0xF0, c = st & 15, d1 = u[p++], d2 = hi === 0xC0 || hi === 0xD0 ? 0 : u[p++], id = c * 128 + d1;
+      if (hi === 0x90 && d2) { (open[id] ||= []).push(notes.length); notes.push({t, end: t, c, key: d1}); }
+      else if (hi === 0x80 || hi === 0x90) { const i = open[id]?.shift(); if (i != null) notes[i].end = t; }
+    }
+    o = end;
+  }
+  if (!notes.length) throw new Error('aucune note dans ce fichier');
+  const s = migrate({bpm: Math.max(60, Math.min(240, Math.round(60e6 / (tempo || 5e5)))), order: []}), q = div / 4, max = PATS.length * STEPS;
+  const count = {}; for (const n of notes) if (n.c !== 9) count[n.c] = (count[n.c] || 0) + 1;
+  const chans = Object.keys(count).map(Number).sort((a, b) => count[b] - count[a]).slice(0, 4), map = {};
+  if (chans.every(c => [0, 1, 2, 4].includes(c))) for (const c of chans) map[c] = c;
+  else { const avg = c => { const l = notes.filter(n => n.c === c); return l.reduce((a, n) => a + n.key, 0) / l.length; }, low = chans.slice().sort((a, b) => avg(a) - avg(b))[0]; let free = [0, 1, 4]; for (const c of chans) map[c] = c === low && chans.length > 1 ? 2 : free.shift() ?? 2; }
+  map[9] = NOISE;
+  let last = 0, put = 0;
+  for (const n of notes) {
+    const v = map[n.c]; if (v == null) continue; const step = Math.round(n.t / q); if (step >= max) continue;
+    const P = PATS[Math.floor(step / STEPS)], i = step % STEPS, row = s.pats[P][v];
+    if (v === NOISE) { const k = DRUMS.reduce((b, d, j) => Math.abs(d[6] - n.key) < Math.abs(DRUMS[b][6] - n.key) ? j : b, 0); if (row[i] < 0) { row[i] = k; put++; } }
+    else {
+      let val = n.key - LOW + (v === 2 ? 12 : 0); while (val < 0) val += 12; while (val >= NOTES) val -= 12;
+      if (row[i] >= 0 && (v === 2 ? row[i] <= val : row[i] >= val)) continue;  // un accord : le chant garde la note haute, la basse la note grave
+      if (row[i] < 0) put++; row[i] = val;
+      const len = Math.max(1, Math.round((n.end - n.t) / q)); for (let k = 1; k < len && i + k < STEPS && row[i + k] === -1; k++) row[i + k] = -2;
+    }
+    last = Math.max(last, Math.floor(step / STEPS));
+  }
+  s.order = [...PATS.slice(0, last + 1)];
+  return {song: s, notes: put};
+}
+// le partage : le morceau compressé dans un code texte (« BITTUNE1: »), à coller dans un autre BitTune
+async function toCode(song) {
+  const z = await new Response(new Blob([JSON.stringify(song)]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer();
+  let b = ''; for (const x of new Uint8Array(z)) b += String.fromCharCode(x); return 'BITTUNE1:' + btoa(b);
+}
+async function fromCode(code) {
+  const m = /BITTUNE1:([A-Za-z0-9+/=]+)/.exec(String(code).replace(/\s+/g, '')); if (!m) throw new Error('code BitTune introuvable');
+  const bin = Uint8Array.from(atob(m[1]), c => c.charCodeAt(0)), j = JSON.parse(await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text());
+  if (!j.pats || !j.bpm) throw new Error('ce code ne contient pas de morceau'); return migrate(j);
+}
 // les morceaux d'exemple, écrits note par note
 function demo() {  // un petit air de départ en la mineur
   const p = empty(), mel = [12, -1, 15, -1, 19, -2, 17, -1, 15, -1, 14, -1, 12, -2, -2, -1, 10, -1, 12, -1, 14, -2, 15, -1, 14, -1, 12, -1, 9, -2, -2, -1];
@@ -157,7 +212,10 @@ export default async function (ctx) {
   // vérification : les morceaux d'exemple se programment hors ligne et font du son, le WAV et le MIDI ont le bon en-tête
   (async () => { const ex = example('Aventure'), oc = new OfflineAudioContext(2, 22050, 22050), r = schedule(oc, oc.destination, {...ex, bpm: 240, order: ['A']}, 0), b = await oc.startRendering(), d = b.getChannelData(0), w = wav(b), m = midi(ex);
     let peak = 0; for (const v of d) peak = Math.max(peak, Math.abs(v));
-    console.assert(r.notes > 40 && peak > .05 && peak <= 2 && w.length === 44 + 22050 * 4 && String.fromCharCode(...w.slice(8, 12)) === 'WAVE' && String.fromCharCode(...m.slice(0, 4)) === 'MThd' && m.length > 200, 'bittune : rendu ' + peak); })();
+    console.assert(r.notes > 40 && peak > .05 && peak <= 2 && w.length === 44 + 22050 * 4 && String.fromCharCode(...w.slice(8, 12)) === 'WAVE' && String.fromCharCode(...m.slice(0, 4)) === 'MThd' && m.length > 200, 'bittune : rendu ' + peak);
+    const back = midiIn(m).song, code = await toCode(ex), again = await fromCode(code);
+    console.assert(back.pats.A[0].join() === ex.pats.A[0].join() && back.pats.B[3].join() === ex.pats.B[3].join() && back.order.length === 4 && JSON.stringify(again.pats) === JSON.stringify(ex.pats), 'bittune : import MIDI ou code');
+    view.dataset.selfcheck = back.pats.A[0].join() === ex.pats.A[0].join() && JSON.stringify(again.pats) === JSON.stringify(ex.pats) ? 'ok' : 'import'; })();
   // ---------- l'interface ----------
   view.innerHTML = '';
   const wrap = el('div', 'appWrap'), head = el('div', 'agHead'), top = el('div', 'btTop'), chans = el('div', 'btCh'), card = el('div', 'sysCard px'), mix = el('div', 'btRow'), tools = el('div', 'btRow'), patRow = el('div', 'btRow'), files = el('div', 'btRow');
@@ -278,7 +336,11 @@ export default async function (ctx) {
   fileIn.onchange = async () => { const f = fileIn.files[0]; fileIn.value = ''; if (!f) return; try { const j = JSON.parse(await f.text()); if (!j.pats || !j.bpm) throw 0; snap(); song = migrate(j); save(); all(); toast('Morceau ouvert : ' + f.name); } catch { toast('Ce fichier n\'est pas un morceau BitTune'); } };
   const exSel = el('select', 'f'); exSel.append(el('option', '', 'Exemples…')); for (const k of ['Départ', 'Aventure', 'Donjon']) { const o = el('option', '', k); o.value = k; exSel.append(o); }
   exSel.onchange = async () => { const k = exSel.value; exSel.selectedIndex = 0; if (!k || !(await ctx.host.confirm?.('Remplacer le morceau par l\'exemple « ' + k + ' » ? (Ctrl+Z pour revenir)') ?? true)) return; snap(); stopIt(); song = example(k); save(); all(); };
-  files.append(wavB, midB, btn('Enregistrer le morceau', () => dl(JSON.stringify(song), 'application/json', 'morceau.bittune.json')), btn('Ouvrir un morceau', () => fileIn.click()), fileIn, exSel);
+  const midIn = el('input'); midIn.type = 'file'; midIn.accept = '.mid,.midi,audio/midi'; midIn.hidden = true;
+  midIn.onchange = async () => { const f = midIn.files[0]; midIn.value = ''; if (!f) return; try { const r = midiIn(await f.arrayBuffer()); snap(); stopIt(); song = r.song; pat = 'A'; save(); all(); toast('MIDI importé : ' + r.notes + ' notes, ' + song.order.length + ' motif(s)'); } catch (e) { toast('Import MIDI impossible : ' + e.message); } };
+  const shareB = btn('Copier le code', async () => { const c = await toCode(song); navigator.clipboard.writeText(c).then(() => toast('Code du morceau copié (' + c.length + ' caractères) : colle-le à un ami'), () => toast('Impossible de copier')); });
+  const pasteB = btn('Coller un code', async () => { const c = await ctx.host.ask?.('Colle le code du morceau (il commence par BITTUNE1:)', '', ''); if (!c) return; try { const s2 = await fromCode(c); snap(); stopIt(); song = s2; pat = 'A'; save(); all(); toast('Morceau ouvert depuis le code'); } catch (e) { toast(e.message); } });
+  files.append(wavB, midB, btn('Importer MIDI', () => midIn.click()), midIn, shareB, pasteB, btn('Enregistrer le morceau', () => dl(JSON.stringify(song), 'application/json', 'morceau.bittune.json')), btn('Ouvrir un morceau', () => fileIn.click()), fileIn, exSel);
   const onKey = e => {
     if (!view.isConnected) { document.removeEventListener('keydown', onKey); return; } if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return;
     if (e.code === 'Space' && document.activeElement?.tagName !== 'BUTTON') { e.preventDefault(); playing ? stopIt() : start(); }

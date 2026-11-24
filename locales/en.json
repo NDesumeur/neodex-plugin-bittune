@@ -107,5 +107,21 @@
  "dent de scie :": "sawtooth:",
  "WAV silencieux :": "silent WAV:",
  "note tenue, vibrato, annuler, dent de scie, ordre, MIDI": "held note, vibrato, undo, sawtooth, order, MIDI",
- "Compose de la musique chiptune : 5 voies (deux carrées, triangle, bruit à 6 percussions, dent de scie), 8 motifs de 32 pas sur 3 octaves, effets par note (vibrato, arpèges, glissés, piqué, volume), panoramique, écho, swing, gammes, muet et solo. Lecture avec oscilloscope, export WAV et MIDI, morceaux à enregistrer et 3 exemples.": "Compose chiptune music: 5 voices (two squares, triangle, noise with 6 drums, sawtooth), 8 patterns of 32 steps over 3 octaves, per-note effects (vibrato, arpeggios, slides, staccato, volume), panning, echo, swing, scales, mute and solo. Playback with an oscilloscope, WAV and MIDI export, songs to save and 3 examples."
+ "Compose de la musique chiptune : 5 voies (deux carrées, triangle, bruit à 6 percussions, dent de scie), 8 motifs de 32 pas sur 3 octaves, effets par note (vibrato, arpèges, glissés, piqué, volume), panoramique, écho, swing, gammes, muet et solo. Lecture avec oscilloscope, export WAV et MIDI, morceaux à enregistrer et 3 exemples.": "Compose chiptune music: 5 voices (two squares, triangle, noise with 6 drums, sawtooth), 8 patterns of 32 steps over 3 octaves, per-note effects (vibrato, arpeggios, slides, staccato, volume), panning, echo, swing, scales, mute and solo. Playback with an oscilloscope, WAV and MIDI export, songs to save and 3 examples.",
+ "ce n'est pas un fichier MIDI": "this is not a MIDI file",
+ "MIDI au format SMPTE : non pris en charge": "SMPTE-timed MIDI is not supported",
+ "aucune note dans ce fichier": "no notes in this file",
+ "ce code ne contient pas de morceau": "this code holds no song",
+ "code BitTune introuvable": "no BitTune code found",
+ "MIDI importé :": "MIDI imported:",
+ "Import MIDI impossible :": "MIDI import failed:",
+ "Copier le code": "Copy code",
+ "Code du morceau copié (": "Song code copied (",
+ "caractères) : colle-le à un ami": "characters): paste it to a friend",
+ "Impossible de copier": "Could not copy",
+ "Coller un code": "Paste a code",
+ "Colle le code du morceau (il commence par BITTUNE1:)": "Paste the song code (it starts with BITTUNE1:)",
+ "Morceau ouvert depuis le code": "Song opened from the code",
+ "Importer MIDI": "Import MIDI",
+ "bittune : import MIDI ou code": "bittune: MIDI import or code"
 }

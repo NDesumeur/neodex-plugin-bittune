@@ -1,7 +1,7 @@
 {
   "id": "neodex.bittune",
   "name": "BitTune",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "NDesumeur",
   "description": "Compose de la musique chiptune : 5 voies (deux carrées, triangle, bruit à 6 percussions, dent de scie), 8 motifs de 32 pas sur 3 octaves, effets par note (vibrato, arpèges, glissés, piqué, volume), panoramique, écho, swing, gammes, muet et solo. Lecture avec oscilloscope, export WAV et MIDI, morceaux à enregistrer et 3 exemples.",
   "icon": "icon.png",

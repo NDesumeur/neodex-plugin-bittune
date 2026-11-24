@@ -6,6 +6,10 @@ Compose de la musique chiptune, avec les 5 voies des vieilles consoles 8 bits, d
 
 ![BitTune](screenshots/1.jpg)
 
+## Import MIDI et partage par code (nouveau en 1.3.0)
+
+Importer MIDI ouvre un fichier MIDI dans les motifs ; Copier le code et Coller un code partagent un morceau en texte.
+
 ## Les voies
 
 - **Carré 1** et **Carré 2** : la mélodie et l'accompagnement. Trois formes d'onde : rapport cyclique 12,5 %, 25 % ou 50 % (du plus nasillard au plus rond).
@@ -30,6 +34,8 @@ Chaque voie a son **volume**, son **panoramique** (gauche ou droite), son **éch
 
 - **Exporter WAV** rend tout le morceau en stéréo 44,1 kHz, effets et écho compris.
 - **Exporter MIDI** donne un fichier pour ton logiciel de musique : une voie MIDI par voie, les percussions sur la voie 10.
+- **Importer MIDI** ouvre un fichier MIDI : les notes sont ramenées à la double croche, sur 8 motifs au plus (16 mesures en 4/4). Les percussions vont au bruit, les quatre voies les plus remplies aux autres (la plus grave au triangle).
+- **Copier le code** met le morceau dans un code texte (BITTUNE1:…) à envoyer à un ami ; **Coller un code** l'ouvre dans son BitTune.
 - **Enregistrer le morceau** et **Ouvrir un morceau** : un fichier `.bittune.json` pour le garder ou le partager.
 
 ## Données
